@@ -8,7 +8,7 @@
  - vue2.0+vue-router+vue-resource
  - express+mongodb
  - element-ui组件库
- - markdown编辑器vue-simplemde
+ - markdown编辑器：vue-simplemde
 
 home页面
 ![](https://github.com/mjnash13/blog/blob/master/previewImg/home.jpg)
@@ -20,7 +20,7 @@ home页面
 ![](https://github.com/mjnash13/blog/blob/master/previewImg/register.png)
 
 写博客
-![](https://github.com/mjnash13/blog/blob/master/previewImg/newBlog.jpg)
+![](https://github.com/mjnash13/blog/blob/master/previewImg/newblog.jpg)
 
 浏览博客
 ![](https://github.com/mjnash13/blog/blob/master/previewImg/blogContent.jpg)
