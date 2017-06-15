@@ -21,7 +21,7 @@
                             <el-col :span="12" :offset="2">
                                 <h2 style="margin-top:15%">加入我们，分享，学习</h2>
                             </el-col>
-                            <el-col :span="8">
+                            <el-col :span="8" v-if="btnShow">
                                 <el-row>
                                     <el-col>
                                         <el-button class="loginBtn" :plain="true" type="info" @click="skip('login')">登录</el-button>
@@ -66,10 +66,19 @@ export default {
     name: 'home',
     data() {
         return {
-
+          btnShow: true
+        }
+    },
+    created: function() {
+        if (sessionStorage.getItem('userId')) {
+            this.btnShow = false;
+            this.changeLoginStatus();
         }
     },
     methods: {
+        changeLoginStatus() {
+            this.$emit('change-loginStatus')
+        },
         skip: function(destination) {
             this.$router.push(destination)
         },

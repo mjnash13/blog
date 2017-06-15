@@ -8,7 +8,7 @@
  - vue2.0+vue-router+vue-resource
  - express+mongodb
  - element-ui组件库
- - markdown编辑器：vue-simplemde
+ - markdown编辑器vue-simplemde
 
 home页面
 ![](https://github.com/mjnash13/blog/blob/master/previewImg/home.jpg)
@@ -20,7 +20,7 @@ home页面
 ![](https://github.com/mjnash13/blog/blob/master/previewImg/register.png)
 
 写博客
-![](https://github.com/mjnash13/blog/blob/master/previewImg/newblog.jpg)
+![](https://github.com/mjnash13/blog/blob/master/previewImg/newBlog.jpg)
 
 浏览博客
 ![](https://github.com/mjnash13/blog/blob/master/previewImg/blogContent.jpg)
@@ -28,20 +28,13 @@ home页面
 用户中心
 ![](https://github.com/mjnash13/blog/blob/master/previewImg/user.jpg)
 
-### 本地查看方法
+### 本地运行方法
 
-查看前端页面
 ``` bash
 # git clone https://github.com/mjnash13/blog.git
 # cd blog
 # npm install
-# npm run dev
-# localhost:8080
-```
-启动服务器
-``` bash
-安装并运行 MongoDB 服务器
-下载mongoose等依赖包
 # cd server
-# supervisor --harmony index
+# node index
+# localhost:8088
 ```

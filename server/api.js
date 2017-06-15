@@ -7,7 +7,7 @@ const sha1 = require('sha1');
 const router = express.Router();
 
 // 创建账号接口
-router.post('/register', (req, res) => {
+router.post('/api/register', (req, res) => {
     // 这里的req.body能够使用就在index.js中引入了const bodyParser = require('body-parser')
     let newAccount = new models.Users({
         userName: req.body.userName,
@@ -49,7 +49,7 @@ router.post('/register', (req, res) => {
     });
 });
 
-router.post('/login', (req, res) => {
+router.post('/api/login', (req, res) => {
     let userName = req.body.userName;
     let password = sha1(req.body.password);
     models.Users.findOne({
@@ -79,7 +79,7 @@ router.post('/login', (req, res) => {
 });
 
 //保存草稿
-router.post('/saveDraft', (req, res) => {
+router.post('/api/saveDraft', (req, res) => {
     let newDraft = new models.Draft({
         userId: req.body.userId,
         userName: req.body.userName,
@@ -126,7 +126,7 @@ router.post('/saveDraft', (req, res) => {
 });
 
 //发布博客
-router.post('/saveBlog', (req, res) => {
+router.post('/api/saveBlog', (req, res) => {
     let newBlog = new models.Blog({
         userId: req.body.userId,
         userName: req.body.userName,
@@ -158,7 +158,7 @@ router.post('/saveBlog', (req, res) => {
 });
 
 //最新文章
-router.post('/latestBlogs', (req, res) => {
+router.post('/api/latestBlogs', (req, res) => {
     models.Blog.find({
         publicStatus: true
     }, {
@@ -181,7 +181,7 @@ router.post('/latestBlogs', (req, res) => {
 });
 
 //最火文章
-router.post('/hottestBlogs', (req, res) => {
+router.post('/api/hottestBlogs', (req, res) => {
     models.Blog.find({
         publicStatus: true
     }, {
@@ -204,7 +204,7 @@ router.post('/hottestBlogs', (req, res) => {
 });
 
 // 查询文章详情路由
-router.post('/blogContent/:id', function(req, res) {
+router.post('/api/blogContent/:id', function(req, res) {
     models.Blog.findByIdAndUpdate(req.params.id, {
         $inc: {
             hitCount: 1
@@ -219,7 +219,7 @@ router.post('/blogContent/:id', function(req, res) {
 });
 
 //草稿箱
-router.post('/myDrafts', (req, res) => {
+router.post('/api/myDrafts', (req, res) => {
     models.Draft.find({
         userId: req.body.userId
     }).sort({
@@ -234,7 +234,7 @@ router.post('/myDrafts', (req, res) => {
 });
 
 //编辑草稿
-router.post('/draftContent/:id', (req, res) => {
+router.post('/api/draftContent/:id', (req, res) => {
     models.Draft.findById(req.params.id, (err, data) => {
         if (err) {
             res.send(err);
@@ -245,7 +245,7 @@ router.post('/draftContent/:id', (req, res) => {
 });
 
 //删除草稿
-router.post('/deleteDraft', (req, res) => {
+router.post('/api/deleteDraft', (req, res) => {
     models.Draft.findByIdAndRemove(req.body.draftId, (err, data) => {
         if (err) {
             res.send(err);
@@ -258,7 +258,7 @@ router.post('/deleteDraft', (req, res) => {
 });
 
 //我的博客
-router.post('/myBlogs', (req, res) => {
+router.post('/api/myBlogs', (req, res) => {
     models.Blog.find({
         userId: req.body.userId
     }).sort({
@@ -273,7 +273,7 @@ router.post('/myBlogs', (req, res) => {
 });
 
 //删除博客
-router.post('/deleteBlog', (req, res) => {
+router.post('/api/deleteBlog', (req, res) => {
     models.Blog.findByIdAndRemove(req.body.blogId, (err, data) => {
         if (err) {
             res.send(err);
@@ -286,7 +286,7 @@ router.post('/deleteBlog', (req, res) => {
 });
 
 //个人中心
-router.post('/personalCenter', (req, res) => {
+router.post('/api/personalCenter', (req, res) => {
     models.Users.findById(req.body.userId, (err, data) => {
         if (err) {
             res.send(err);
@@ -298,7 +298,7 @@ router.post('/personalCenter', (req, res) => {
 });
 
 //修改个人信息
-router.post('/saveUserInfo', (req, res) => {
+router.post('/api/saveUserInfo', (req, res) => {
     models.Users.findByIdAndUpdate(req.body.id, {
         realName: req.body.realName,
         sex: req.body.sex,
@@ -317,7 +317,7 @@ router.post('/saveUserInfo', (req, res) => {
 });
 
 //修改密码
-router.post('/modifyPassword', (req, res) => {
+router.post('/api/modifyPassword', (req, res) => {
     models.Users.findById(req.body.id, (err, data) => {
         if (err) {
             res.send(err);
@@ -347,7 +347,7 @@ router.post('/modifyPassword', (req, res) => {
 
 //查询
 
-router.post('/search', (req, res) => {
+router.post('/api/search', (req, res) => {
     if (req.body.select == 2) {
         models.Blog.find({
             publicStatus: true,
