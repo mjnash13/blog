@@ -31,8 +31,8 @@
                     </el-col>
                 </el-row>
                 <el-row>
-                    <el-col class="content" :span="14" :offset="2">
-                        <div v-html='blog.html'></div>
+                    <el-col class="content" :span="20" :offset="2">
+                        <div class="contentHtml" v-html='blog.html'></div>
                     </el-col>
                 </el-row>
             </el-col>
@@ -101,5 +101,8 @@ export default {
 }
 .contentAll {
     min-height: 90vh;
+}
+.contentHtml {
+    overflow-x: auto;
 }
 </style>
