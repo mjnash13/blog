@@ -14,7 +14,7 @@
                                     <el-input placeholder="密码" v-model="loginForm.password" type="password">></el-input>
                                 </el-form-item>
                                 <el-form-item style="width:80%">
-                                    <el-button type="primary" @click="login('loginForm')" class="loginBtn">登录</el-button>还没账号？前去<a href="#" @click="register">注册</a>
+                                    <el-button type="primary" @click="login('loginForm')" class="loginBtn">登录</el-button>还没账号？前去<a href="#/register">注册</a>
                                 </el-form-item>
                             </el-form>
                             <div style="text-align:center"><img src="../assets/login.jpg"></div>
