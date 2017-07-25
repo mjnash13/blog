@@ -82,9 +82,6 @@ export default {
                 }
             });
         },
-        register() {
-            this.$router.push('register')
-        },
         changeLoginStatus() {
             this.$emit('change-loginStatus')
         }
