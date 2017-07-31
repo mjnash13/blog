@@ -6,6 +6,10 @@ const fs = require('fs');
 const path = require('path');
 // 引入处理post数据的模块
 const bodyParser = require('body-parser')
+
+const http = require('http');
+const https = require('https');
+
     // 引入Express
 const express = require('express');
 const session = require('express-session');
@@ -33,5 +37,21 @@ app.use(express.static(path.resolve(__dirname, '../dist')));
         //const html = fs.readFileSync(path.resolve(__dirname, '../dist/index.html'), 'utf-8')
         res.send('html');
     });*/
-    // 监听8088端口
-app.listen(8088);
+// 监听8088端口
+//app.listen(8088);
+
+var options = {
+    ca: fs.readFileSync('key/ca_bundle.crt'),
+    key: fs.readFileSync('key/private.key'),
+    cert: fs.readFileSync('key/certificate.crt')
+};
+
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(options, app);
+
+httpServer.listen(80, function() {
+    console.log('HTTP Server is running on: http://localhost:%s', 80);
+});
+httpsServer.listen(443, function() {
+    console.log('HTTPS Server is running on: https://localhost:%s', 443);
+});

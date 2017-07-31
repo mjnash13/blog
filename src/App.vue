@@ -58,7 +58,8 @@
         <div class="footer">
             <el-row>
                 <el-col :span="24">
-                    <div class="footerContent">Copyright © 2017 秦子健. All rights reserved.
+                    <div class="footerContent"><a class="record" href="http://www.miitbeian.gov.cn" target="_blank">鄂ICP备17017287号</a>
+                        Copyright © 2017 秦子健. All Rights Reserved.
                         <a href="https://github.com/mjnash13" target="_blank"><img class="footerIcon" src="./assets/icon_github.svg"></a>
                         <a href="mailto:qinzj13@gmail.com"><img class="footerIcon" src="./assets/icon-email.svg"></a>
                     </div>
@@ -175,5 +176,9 @@ export default {
 .footerIcon {
     padding-left: 2%;
     height: 100%;
+}
+.record {
+    text-decoration:none;
+    color:white;
 }
 </style>
