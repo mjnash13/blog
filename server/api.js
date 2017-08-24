@@ -34,8 +34,7 @@ router.post('/api/register', (req, res) => {
                     var token = jwt.sign(req.session.user, 'app.get(superSecret)', {
                         expiresIn: 60 * 60 * 24 // 设置过期时间
                     });
-                    //return res.send(token);
-                    //res.redirect('/latestBlogs');
+                    req.session.token = token;
                     return res.send({
                         success: true,
                         message: '注册成功!',
@@ -62,6 +61,7 @@ router.post('/api/login', (req, res) => {
             var token = jwt.sign(req.session.user, 'app.get(superSecret)', {
                 expiresIn: 60 * 60 * 24 // 设置过期时间
             });
+            req.session.token = token;
             return res.send({
                 success: true,
                 message: '登录成功!',
@@ -80,81 +80,95 @@ router.post('/api/login', (req, res) => {
 
 //保存草稿
 router.post('/api/saveDraft', (req, res) => {
-    let newDraft = new models.Draft({
-        userId: req.body.userId,
-        userName: req.body.userName,
-        title: req.body.title,
-        tags: req.body.tags,
-        publicStatus: req.body.publicStatus,
-        content: req.body.content,
-        html: req.body.html,
-        saveTime: req.body.saveTime
-    });
-
-    if (req.body.draftId != '未保存') {
-        models.Draft.findByIdAndUpdate(req.body.draftId, {
+    let token = req.get('x-access-token');
+    if (token == req.session.token) {
+        let newDraft = new models.Draft({
+            userId: req.body.userId,
+            userName: req.body.userName,
             title: req.body.title,
             tags: req.body.tags,
             publicStatus: req.body.publicStatus,
             content: req.body.content,
             html: req.body.html,
             saveTime: req.body.saveTime
-        }, (err, data) => {
-            if (err) {
-                res.send(err);
-            } else {
-                return res.send({
-                    success: true,
-                    message: '保存草稿成功!',
-                    draftId: data._id
-                });
-            }
         });
+
+        if (req.body.draftId != '未保存') {
+            models.Draft.findByIdAndUpdate(req.body.draftId, {
+                title: req.body.title,
+                tags: req.body.tags,
+                publicStatus: req.body.publicStatus,
+                content: req.body.content,
+                html: req.body.html,
+                saveTime: req.body.saveTime
+            }, (err, data) => {
+                if (err) {
+                    res.send(err);
+                } else {
+                    return res.send({
+                        success: true,
+                        message: '保存草稿成功!',
+                        draftId: data._id
+                    });
+                }
+            });
+        } else {
+            newDraft.save((err, data) => {
+                if (err) {
+                    res.send(err);
+                } else {
+                    return res.send({
+                        success: true,
+                        message: '保存草稿成功!',
+                        draftId: data._id
+                    });
+                }
+            });
+        }
     } else {
-        newDraft.save((err, data) => {
-            if (err) {
-                res.send(err);
-            } else {
-                return res.send({
-                    success: true,
-                    message: '保存草稿成功!',
-                    draftId: data._id
-                });
-            }
-        });
+        res.send({
+            message: 'token error'
+        })
     }
 });
 
 //发布博客
 router.post('/api/saveBlog', (req, res) => {
-    let newBlog = new models.Blog({
-        userId: req.body.userId,
-        userName: req.body.userName,
-        title: req.body.title,
-        tags: req.body.tags,
-        publicStatus: req.body.publicStatus,
-        content: req.body.content,
-        html: req.body.html,
-        publishTime: req.body.publishTime,
-        hitCount: 0
-    });
-    if (req.body.draftId != '未保存') {
-        models.Draft.findByIdAndRemove(req.body.draftId, (err, data) => {
-            if (err) {
-                res.send(err);
-            }
+    let token = req.get('x-access-token');
+    if (token == req.session.token) {
+        let newBlog = new models.Blog({
+            userId: req.body.userId,
+            userName: req.body.userName,
+            title: req.body.title,
+            tags: req.body.tags,
+            publicStatus: req.body.publicStatus,
+            content: req.body.content,
+            html: req.body.html,
+            publishTime: req.body.publishTime,
+            hitCount: 0
         });
-    }
-    newBlog.save((err, data) => {
-        if (err) {
-            res.send(err);
-        } else {
-            return res.send({
-                success: true,
-                message: '文章已发布!'
+        if (req.body.draftId != '未保存') {
+            models.Draft.findByIdAndRemove(req.body.draftId, (err, data) => {
+                if (err) {
+                    res.send(err);
+                }
             });
         }
-    });
+        newBlog.save((err, data) => {
+            if (err) {
+                res.send(err);
+            } else {
+                return res.send({
+                    success: true,
+                    message: '文章已发布!'
+                });
+            }
+        });
+    } else {
+        res.send({
+            message: 'token error'
+        })
+    }
 });
 
 //最新文章
@@ -220,129 +234,188 @@ router.post('/api/blogContent/:id', function(req, res) {
 
 //草稿箱
 router.post('/api/myDrafts', (req, res) => {
-    models.Draft.find({
-        userId: req.body.userId
-    }).sort({
-        'saveTime': -1
-    }).exec((err, data) => {
-        if (err) {
-            res.send(err);
-        } else {
-            res.json(JSON.stringify(data));
-        }
-    });
+    let token = req.get('x-access-token');
+    if (token == req.session.token) {
+        models.Draft.find({
+            userId: req.body.userId
+        }).sort({
+            'saveTime': -1
+        }).exec((err, data) => {
+            if (err) {
+                res.send(err);
+            } else {
+                res.json(JSON.stringify(data));
+            }
+        });
+    } else {
+        res.send({
+            message: 'token error'
+        })
+    }
 });
 
 //编辑草稿
 router.post('/api/draftContent/:id', (req, res) => {
-    models.Draft.findById(req.params.id, (err, data) => {
-        if (err) {
-            res.send(err);
-        } else {
-            res.json(JSON.stringify(data));
-        }
-    });
+    let token = req.get('x-access-token');
+    if (token == req.session.token) {
+        models.Draft.findById(req.params.id, (err, data) => {
+            if (err) {
+                res.send(err);
+            } else {
+                res.json(JSON.stringify(data));
+            }
+        });
+    } else {
+        res.send({
+            message: 'token error'
+        })
+    }
 });
 
 //删除草稿
 router.post('/api/deleteDraft', (req, res) => {
-    models.Draft.findByIdAndRemove(req.body.draftId, (err, data) => {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send({
-                index: req.body.index
-            })
-        }
-    });
+    let token = req.get('x-access-token');
+    if (token == req.session.token) {
+        models.Draft.findByIdAndRemove(req.body.draftId, (err, data) => {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send({
+                    index: req.body.index
+                })
+            }
+        });
+    } else {
+        res.send({
+            message: 'token error'
+        })
+    }
 });
 
 //我的博客
 router.post('/api/myBlogs', (req, res) => {
-    models.Blog.find({
-        userId: req.body.userId
-    }).sort({
-        'publishTime': -1
-    }).exec((err, data) => {
-        if (err) {
-            res.send(err);
-        } else {
-            res.json(JSON.stringify(data));
-        }
-    });
+    let token = req.get('x-access-token');
+    if (token == req.session.token) {
+        models.Blog.find({
+            userId: req.body.userId
+        }).sort({
+            'publishTime': -1
+        }).exec((err, data) => {
+            if (err) {
+                res.send(err);
+            } else {
+                res.json(JSON.stringify(data));
+            }
+        });
+    } else {
+        res.send({
+            message: 'token error'
+        })
+    }
 });
 
 //删除博客
 router.post('/api/deleteBlog', (req, res) => {
-    models.Blog.findByIdAndRemove(req.body.blogId, (err, data) => {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send({
-                index: req.body.index
-            })
-        }
-    });
+    let token = req.get('x-access-token');
+    if (token == req.session.token) {
+        models.Blog.findByIdAndRemove(req.body.blogId, (err, data) => {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send({
+                    index: req.body.index
+                })
+            }
+        });
+    } else {
+        res.send({
+            message: 'token error'
+        })
+    }
 });
 
 //个人中心
 router.post('/api/personalCenter', (req, res) => {
-    models.Users.findById(req.body.userId, (err, data) => {
-        if (err) {
-            res.send(err);
-        } else {
-            data.password = undefined;
-            res.send(data);
-        }
-    });
+    let token = req.get('x-access-token');
+    if (token == req.session.token) {
+        models.Users.findById(req.body.userId, (err, data) => {
+            if (err) {
+                res.send(err);
+            } else {
+                data.password = undefined;
+                res.send(data);
+            }
+        });
+    } else {
+        res.send({
+            message: 'token error'
+        })
+    }
+
 });
 
 //修改个人信息
 router.post('/api/saveUserInfo', (req, res) => {
-    models.Users.findByIdAndUpdate(req.body.id, {
-        realName: req.body.realName,
-        sex: req.body.sex,
-        dateOfBirth: req.body.dateOfBirth,
-        individualResume: req.body.individualResume
-    }, (err, data) => {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send({
-                success: true,
-                message: '用户信息修改成功!'
-            });
-        }
-    });
+    let token = req.get('x-access-token');
+    if (token == req.session.token) {
+        models.Users.findByIdAndUpdate(req.body.id, {
+            realName: req.body.realName,
+            sex: req.body.sex,
+            dateOfBirth: req.body.dateOfBirth,
+            individualResume: req.body.individualResume
+        }, (err, data) => {
+            if (err) {
+                res.send(err);
+            } else {
+                res.send({
+                    success: true,
+                    message: '用户信息修改成功!'
+                });
+            }
+        });
+    } else {
+        res.send({
+            message: 'token error'
+        })
+    }
+
 });
 
 //修改密码
 router.post('/api/modifyPassword', (req, res) => {
-    models.Users.findById(req.body.id, (err, data) => {
-        if (err) {
-            res.send(err);
-        } else {
-            if (sha1(req.body.oldPassword) == data.password) {
-                models.Users.findByIdAndUpdate(req.body.id, {
-                    password: sha1(req.body.newPassword)
-                }, (err, data) => {
-                    if (err) {
-                        res.send(err);
-                    } else {
-                        res.send({
-                            success: true,
-                            message: '密码修改成功!'
-                        });
-                    }
-                });
+    let token = req.get('x-access-token');
+    if (token == req.session.token) {
+        models.Users.findById(req.body.id, (err, data) => {
+            if (err) {
+                res.send(err);
             } else {
-                res.send({
-                    success: false,
-                    message: '原密码不正确!'
-                });
+                if (sha1(req.body.oldPassword) == data.password) {
+                    models.Users.findByIdAndUpdate(req.body.id, {
+                        password: sha1(req.body.newPassword)
+                    }, (err, data) => {
+                        if (err) {
+                            res.send(err);
+                        } else {
+                            res.send({
+                                success: true,
+                                message: '密码修改成功!'
+                            });
+                        }
+                    });
+                } else {
+                    res.send({
+                        success: false,
+                        message: '原密码不正确!'
+                    });
+                }
             }
-        }
-    });
+        });
+    } else {
+        res.send({
+            message: 'token error'
+        })
+    }
+
 });
 
 //查询

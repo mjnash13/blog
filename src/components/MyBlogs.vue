@@ -56,7 +56,7 @@ export default {
         }
     },
     created: function() {
-        if (sessionStorage.getItem('userId')) {
+        if (sessionStorage.getItem('token')) {
             this.changeLoginStatus();
         } else {
             this.router.push('login');
@@ -73,9 +73,20 @@ export default {
             let params = {
                 userId: sessionStorage.getItem('userId')
             }
-            this.$http.post('api/myBlogs', params).then(
+            this.$http.post('api/myBlogs', params, {
+                headers: {
+                    'x-access-token': sessionStorage.getItem('token')
+                }
+            }).then(
                 function(res) {
-                    this.tableData = JSON.parse(res.body);
+                    if (res.body.message == 'token error') {
+                        this.$alert('请登录', {
+                            confirmButtonText: '确定',
+                        });
+                        this.$emit('change-loginStatusf');
+                    } else {
+                        this.tableData = JSON.parse(res.body);
+                    }
                 },
                 function() {
                     alert('error');
@@ -99,12 +110,23 @@ export default {
                     blogId: blogId,
                     index: index
                 }
-                this.$http.post('api/deleteBlog', params).then(function(res) {
-                    this.tableData.splice(res.body.index, 1);
-                    this.$message({
-                        type: 'success',
-                        message: '删除成功!'
-                    });
+                this.$http.post('api/deleteBlog', params, {
+                    headers: {
+                        'x-access-token': sessionStorage.getItem('token')
+                    }
+                }).then(function(res) {
+                    if (res.body.message == 'token error') {
+                        this.$alert('请登录', {
+                            confirmButtonText: '确定',
+                        });
+                        this.$emit('change-loginStatusf');
+                    } else {
+                        this.tableData.splice(res.body.index, 1);
+                        this.$message({
+                            type: 'success',
+                            message: '删除成功!'
+                        });
+                    }
                 });
             }).catch(() => {
                 this.$message({

@@ -50,7 +50,7 @@
             <el-col :span="24">
                 <!--  <div class="main"> -->
                 <transition name="fade" mode="out-in">
-                    <router-view @change-loginStatus='changeLoginStatus'></router-view>
+                    <router-view @change-loginStatus='changeLoginStatus' @change-loginStatusf='changeLoginStatusf'></router-view>
                 </transition>
                 <!--  </div> -->
             </el-col>
@@ -117,6 +117,9 @@ export default {
         },
         changeLoginStatus() {
             this.loginStatus = true;
+        },
+        changeLoginStatusf() {
+            this.logout();
         }
     },
     data() {

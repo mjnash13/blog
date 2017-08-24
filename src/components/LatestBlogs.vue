@@ -34,27 +34,20 @@ export default {
         }
     },
     created: function() {
-        if (sessionStorage.getItem('userId')) {
+        if (sessionStorage.getItem('token')) {
             this.changeLoginStatus();
         }
     },
     mounted() {
         this.fetchData()
     },
-    /*created: function(){
-      this.$http.post('/api/latestBlogs/').then(function(res){
-         this.blogs = JSON.parse(res.body);
-      },function(){
-
-      })
-    },*/
     methods: {
         changeLoginStatus() {
             this.$emit('change-loginStatus')
         },
         fetchData() {
             this.$http.post('/api/latestBlogs/').then(function(res) {
-                this.blogs = JSON.parse(res.body);
+              this.blogs = JSON.parse(res.body);
             }, function() {
                 alert('error');
             })

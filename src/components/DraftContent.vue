@@ -65,7 +65,7 @@ export default {
         }
     },
     created: function() {
-        if (sessionStorage.getItem('userId')) {
+        if (sessionStorage.getItem('token')) {
             this.changeLoginStatus();
         } else {
             this.router.push('login');
@@ -78,14 +78,25 @@ export default {
         fetchData() {
             let id = this.$route.params.id;
             sessionStorage.setItem('draftId', id);
-            this.$http.post('/api/draftContent/' + id).
+            this.$http.post('/api/draftContent/' + id, {}, {
+                headers: {
+                    'x-access-token': sessionStorage.getItem('token')
+                }
+            }).
             then(
                 res => {
-                    let draft = JSON.parse(res.body);
-                    this.title = draft.title;
-                    this.dynamicTags = draft.tags;
-                    this.publicStatus = draft.publicStatus;
-                    this.content = draft.content;
+                    if (res.body.message == 'token error') {
+                        this.$alert('请登录', {
+                            confirmButtonText: '确定',
+                        });
+                        this.$emit('change-loginStatusf');
+                    } else {
+                        let draft = JSON.parse(res.body);
+                        this.title = draft.title;
+                        this.dynamicTags = draft.tags;
+                        this.publicStatus = draft.publicStatus;
+                        this.content = draft.content;
+                    }
                 },
                 res => console.log('错误' + res)
             )
@@ -126,17 +137,28 @@ export default {
                     saveTime: saveTime,
                     draftId: sessionStorage.getItem('draftId')
                 }
-                this.$http.post('/api/saveDraft', params).then(function(res) {
-                        sessionStorage.setItem('draftId', res.body.draftId)
-                        this.$alert(res.body.message, {
-                            confirmButtonText: '确定',
-                            callback: action => {
-                                this.$message({
-                                    type: 'info',
-                                    message: res.body.message
-                                });
-                            }
-                        });
+                this.$http.post('/api/saveDraft', params, {
+                    headers: {
+                        'x-access-token': sessionStorage.getItem('token')
+                    }
+                }).then(function(res) {
+                        if (res.body.message == 'token error') {
+                            this.$alert('请登录', {
+                                confirmButtonText: '确定',
+                            });
+                            this.$emit('change-loginStatusf');
+                        } else {
+                            sessionStorage.setItem('draftId', res.body.draftId)
+                            this.$alert(res.body.message, {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                                    this.$message({
+                                        type: 'info',
+                                        message: res.body.message
+                                    });
+                                }
+                            });
+                        }
                     },
                     function() {
                         alert("error");
@@ -187,19 +209,30 @@ export default {
                     publishTime: publishTime,
                     draftId: sessionStorage.getItem('draftId')
                 }
-                this.$http.post('api/saveBlog', params).then(
+                this.$http.post('api/saveBlog', params, {
+                    headers: {
+                        'x-access-token': sessionStorage.getItem('token')
+                    }
+                }).then(
                     function(res) {
-                        this.$alert(res.body.message, {
-                            confirmButtonText: '确定',
-                            callback: action => {
-                                this.$message({
-                                    type: 'info',
-                                    message: res.body.message
-                                });
-                            }
+                        if (res.body.message == 'token error') {
+                            this.$alert('请登录', {
+                                confirmButtonText: '确定',
+                            });
+                            this.$emit('change-loginStatusf');
+                        } else {
+                            this.$alert(res.body.message, {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                                    this.$message({
+                                        type: 'info',
+                                        message: res.body.message
+                                    });
+                                }
 
-                        });
-                        this.$router.push('latestBlogs');
+                            });
+                            this.$router.push('latestBlogs');
+                        }
                     },
                     function() {
                         alert('error');

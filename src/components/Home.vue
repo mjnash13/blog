@@ -70,7 +70,7 @@ export default {
         }
     },
     created: function() {
-        if (sessionStorage.getItem('userId')) {
+        if (sessionStorage.getItem('token')) {
             this.btnShow = false;
             this.changeLoginStatus();
         }

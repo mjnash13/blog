@@ -10,6 +10,10 @@
  - element-ui组件库
  - markdown编辑器vue-simplemde
 
+
+[网站地址][1]
+
+
 home页面
 ![](https://github.com/mjnash13/blog/blob/master/previewImg/home.jpg)
 
@@ -38,3 +42,6 @@ home页面
 # node index
 # localhost:8088
 ```
+
+
+  [1]: https://www.qinzj.cn/

@@ -151,7 +151,7 @@ export default {
         }
     },
     created: function() {
-        if (sessionStorage.getItem('userId')) {
+        if (sessionStorage.getItem('token')) {
             this.changeLoginStatus();
         } else {
             this.router.push('login');
@@ -168,13 +168,24 @@ export default {
             let params = {
                 userId: sessionStorage.getItem('userId')
             }
-            this.$http.post('api/personalCenter', params).then(
-                function(res) {;
-                    this.userForm.userName = res.body.userName;
-                    this.userForm.realName = res.body.realName;
-                    this.userForm.sex = res.body.sex;
-                    this.userForm.dateOfBirth = res.body.dateOfBirth;
-                    this.userForm.individualResume = res.body.individualResume;
+            this.$http.post('api/personalCenter', params, {
+                headers: {
+                    'x-access-token': sessionStorage.getItem('token')
+                }
+            }).then(
+                function(res) {
+                    if (res.body.message == 'token error') {
+                        this.$alert('请登录', {
+                            confirmButtonText: '确定',
+                        });
+                        this.$emit('change-loginStatusf');
+                    } else {
+                        this.userForm.userName = res.body.userName;
+                        this.userForm.realName = res.body.realName;
+                        this.userForm.sex = res.body.sex;
+                        this.userForm.dateOfBirth = res.body.dateOfBirth;
+                        this.userForm.individualResume = res.body.individualResume;
+                    }
                 },
                 function() {
                     alert('error');
@@ -192,10 +203,21 @@ export default {
                 dateOfBirth: this.editUserForm.dateOfBirth,
                 individualResume: this.editUserForm.individualResume
             }
-            this.$http.post('api/saveUserInfo', params).then(
+            this.$http.post('api/saveUserInfo', params, {
+                headers: {
+                    'x-access-token': sessionStorage.getItem('token')
+                }
+            }).then(
                 res => {
-                    this.$message(res.body.message);
-                    this.dialogFormVisible = false;
+                    if (res.body.message == 'token error') {
+                        this.$alert('请登录', {
+                            confirmButtonText: '确定',
+                        });
+                        this.$emit('change-loginStatusf');
+                    } else {
+                        this.$message(res.body.message);
+                        this.dialogFormVisible = false;
+                    }
                 },
                 res => {
                     alert(res);
@@ -214,9 +236,20 @@ export default {
                             oldPassword: this.modifyPasswordForm.oldPassword,
                             newPassword: this.modifyPasswordForm.pass
                         };
-                        this.$http.post('/api/modifyPassword', params).then(res => {
-                            this.$message(res.body.message);
-                            this.resetForm('modifyPasswordForm');
+                        this.$http.post('/api/modifyPassword', params, {
+                            headers: {
+                                'x-access-token': sessionStorage.getItem('token')
+                            }
+                        }).then(res => {
+                            if (res.body.message == 'token error') {
+                                this.$alert('请登录', {
+                                    confirmButtonText: '确定',
+                                });
+                                this.$emit('change-loginStatusf');
+                            } else {
+                                this.$message(res.body.message);
+                                this.resetForm('modifyPasswordForm');
+                            }
                         }, res => {
                             this.$message('error' + res);
                         })

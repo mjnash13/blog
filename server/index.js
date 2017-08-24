@@ -33,14 +33,14 @@ app.use(api);
 // 访问静态资源文件 这里是访问所有dist目录下的静态资源文件
 app.use(express.static(path.resolve(__dirname, '../dist')));
 // 因为是单页应用 所有请求都走/dist/index.html
-/*app.get('/', function(req, res) {
+app.get('/', function(req, res) {
         //const html = fs.readFileSync(path.resolve(__dirname, '../dist/index.html'), 'utf-8')
         res.send('html');
-    });*/
+    });
 // 监听8088端口
-//app.listen(8088);
+app.listen(8088);
 
-var options = {
+/*var options = {
     ca: fs.readFileSync('key/ca_bundle.crt'),
     key: fs.readFileSync('key/private.key'),
     cert: fs.readFileSync('key/certificate.crt')
@@ -54,4 +54,4 @@ httpServer.listen(80, function() {
 });
 httpsServer.listen(443, function() {
     console.log('HTTPS Server is running on: https://localhost:%s', 443);
-});
+});*/
